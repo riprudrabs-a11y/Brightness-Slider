@@ -1,75 +1,144 @@
-# Arduino Piezo Drums
+# Brightness Edge Slider
 
-A miniature, highly responsive 5-piece electronic drum kit built using an Arduino Mega 2560 and piezoelectric sensors. This project bridges physical percussion with web-based audio synthesis using the Web Serial API.
+A custom, high-performance desktop brightness slider for Windows built with AutoHotkey v2. The tool lets you control screen brightness by scrolling on the far-right edge of the monitor, with a custom sun-to-moon visual interface, smooth color changes, low-brightness dimming, and a full dark mode.
 
 ## 📝 Project Details
-* **Time to Build:** 2 months (Includes learning curve, circuit design, software integration, and troubleshooting).
-* **Developer:** Solo project by a middle schooler with 5 years of Vex IQ robotics experience.
-* **Resources Used:** Built using open-source Arduino community guides and Web Serial documentation, adapted for this custom 5-drum configuration.
-  
- ---
- 
-### Files
-1. Folder HTML Code: This is the folder that has the HTML webpage and all the sounds(Make sure the sounds are in the same folder)
-2. Arduino Drums Case .mhtml: This is a onshape 3d print that you can use for the case for the project
-3. Ardunio drums.fzz: this is the fritzing file if you want to see
-4. Drums_fritzing.png: this is a image if you dont have fritzing
-5. Arduino_drums.ino: ardunio ide code make sure to uplode into ardunio
-   
+
+* **Time to Build:** Built through multiple testing and improvement phases, including input handling, lag reduction, UI design, startup setup, and full dark mode.
+* **Developer:** Solo custom Windows utility project.
+* **Main Goal:** Create a faster and better-looking brightness control than the default Windows brightness popup, while keeping the scroll interaction simple and easy to use.
+* **Main Software Used:** AutoHotkey v2, Windows WMI brightness control, and optional Twinkle Tray fallback support.
 
 ---
 
-## 🛠️ Components
-* 1 x Arduino Mega 2560
-* 5 x 35mm Piezoelectric discs
-* 5 x 1MΩ Resistors (to stabilize the piezo signal and bleed off excess voltage)
-* 1 x 220 Ω Resistor (for LED current limiting)
-* 3 x 5mm Diffused Red LEDs
-* 2 x 5mm Diffused Blue LEDs
-* 7 x Male-to-Male jumper wires
-* 10 x Male-to-Female jumper wires
-* 1 x USB 2.0 Type A to B cable
+### 📁 Files
+
+1. **brightness_edge_slider.ahk:** Main AutoHotkey v2 script. This is the file you run to use the brightness slider.
+2. **README.md:** Project explanation, setup notes, and science-fair style overview.
 
 ---
 
-## 🥁 The Drum Kit Layout
-The kit features 5 total sound triggers divided into standard acoustic categories:
+## 🛠️ Software Requirements
 
-### The 3 Main Components:
-1. **Kick Drum** (Bass)
-2. **Snare Drum**
-3. **Hi-Hat** (Features Open/Closed logic)
-
-### The 2 Secondary Components:
-4. **Tom-Toms**
-5. **Crash Cymbal**
+* Windows computer
+* **AutoHotkey v2 installer/exe:** This is required because it runs the `.ahk` script.
+* **brightness_edge_slider.ahk:** This is the code file for the brightness slider.
+* **Optional: Twinkle Tray:** This is only used as a backup brightness app if Windows native brightness control cannot control the monitor.
 
 ---
 
-## ⚙️ How It Works (The Logic)
+## 💻 Apps Used
 
-This project connects hardware and software together using electrical signals:
+* **AutoHotkey v2:** This is the main app used to run the code. The AutoHotkey `.exe` opens and runs `brightness_edge_slider.ahk`.
+* **Code Editor:** A coding app such as Visual Studio Code, Notepad, or the AutoHotkey editor can be used to write and edit the script.
+* **Windows Brightness / WMI:** The script first tries to change brightness directly through Windows.
+* **Twinkle Tray:** This is optional. It can be used as a backup if Windows cannot control the brightness of the monitor.
+* **Windows Startup Folder:** This is used so the brightness slider can automatically run when the computer starts.
 
-1. **Vibration Capture:** When a piezo disc is pressed or tapped, it sends an analog signal to the Arduino Mega.
-2. **Level Classification:** The code tracks the touch duration and assigns it a "Speed Level" tier:
-   * **Level 1 (Short/Fast):** Triggers a high-pitched, fast playback speed.
-   * **Level 2 (Normal):** Triggers a standard playback speed.
-   * **Level 3 (Long/Slow):** Triggers a deep, low-pitched playback speed.
-3. **Visual Feedback:** The corresponding LED lights up dynamically using Pulse Width Modulation (`analogWrite`) mapped directly to the peak envelope of your hit.
-4. **Web Audio Output:** The Arduino sends the drum name and level tier over a 115,200 baud Serial connection. The custom HTML/JavaScript webpage uses the Web Serial API to read this data, clone the audio sample, apply the calculated `playbackRate`, and play the sound instantly.
+---
+
+## ⚙️ Setup Instructions
+
+1. **Install AutoHotkey v2:** Download and install AutoHotkey v2 so Windows knows how to run `.ahk` files.
+2. **Put the Script in a Folder:** Keep `brightness_edge_slider.ahk` in a folder where you will not delete it.
+3. **Run the Script:** Double-click `brightness_edge_slider.ahk`. AutoHotkey will run it in the background.
+4. **Optional Twinkle Tray Setup:** If your brightness does not change, install Twinkle Tray. The script can use it as a backup method.
+5. **Startup Shortcut:** The script automatically creates a shortcut in the Windows Startup folder so it can start by itself when you log in.
+6. **Test It:** Move your mouse to the far-right edge of the screen and scroll.
+
+---
+
+## ✨ Main Features
+
+The project works like a hidden edge control for brightness:
+
+1. **Right Edge Scroll Control:** When the mouse is on the far-right edge of the screen, scrolling changes brightness instead of scrolling the app underneath.
+2. **Custom Visual Slider:** A small floating slider appears near the mouse with a sun icon at the top, a moon icon at the bottom, and a live percent label.
+3. **Smooth Color Transition:** The slider color changes smoothly from dark moon colors to blue, then into warm sun colors.
+4. **Low Brightness Overlay:** When the brightness gets very low, a transparent black overlay makes the screen look darker than the monitor's normal minimum brightness.
+5. **Full Dark Mode:** Scrolling below `0%` enters `dark` mode, making the screen fully black. Moving the mouse or pressing any key exits back to `0%`.
+6. **Startup Shortcut:** The script automatically creates a Windows Startup shortcut so it can run after login.
+
+---
+
+## ⚙️ How It Works
+
+This project connects mouse input, Windows brightness control, and a custom interface:
+
+1. **Edge Detection:** The script constantly checks whether the mouse is inside a thin zone on the far-right side of the current monitor.
+2. **Scroll Blocking:** AutoHotkey's `#HotIf` system captures `WheelUp` and `WheelDown` only inside that edge zone, which stops webpages or file explorer windows from scrolling underneath.
+3. **Instant UI Update:** The visual slider updates immediately when the wheel moves, so the interface feels responsive even if the real monitor takes a moment to change.
+4. **Debounced Hardware Update:** The script waits briefly after scrolling before sending the brightness command. This prevents Windows or Twinkle Tray from being spammed with too many brightness updates at once.
+5. **Native Brightness First:** The script first tries to control brightness using Windows WMI through `WmiMonitorBrightnessMethods`.
+6. **Twinkle Tray Fallback:** If native Windows brightness control does not work, the script can fall back to Twinkle Tray command-line control.
+7. **Dark Mode Wakeup:** In full dark mode, an `InputHook` watches for keyboard input and a small timer watches for mouse movement. Either one exits full dark mode immediately.
+
+---
+
+## 🧪 Build and Debugging History
+
+### Phase 1: Basic Right-Edge Scrolling
+
+The first version focused on detecting the right edge of the monitor and changing brightness with the mouse wheel. The edge zone was made wider so fast scrolling would not accidentally leave the control area.
+
+### Phase 2: Stopping Background Scrolling
+
+Scrolling on the screen edge originally also scrolled whatever app was underneath. This was fixed with AutoHotkey's `#HotIf` hotkey condition, which captures the wheel only when the mouse is in the edge zone.
+
+### Phase 3: Reducing Lag
+
+Sending a brightness command on every tiny wheel movement caused lag. The script now updates the UI instantly, then waits before sending one final brightness value to the hardware. It also skips duplicate brightness sends.
+
+### Phase 4: Custom Visual Interface
+
+A custom borderless AutoHotkey GUI was added. It includes a percent label, sun and moon symbols, a vertical progress bar, and smooth color changes between dark and bright states.
+
+### Phase 5: Better Low Brightness
+
+Some monitors stop getting darker after a certain point. To solve this, the script adds a transparent black overlay under low brightness levels so the screen can continue to visually dim.
+
+### Phase 6: Full Dark Mode
+
+After reaching `0%`, scrolling down one more time enters a full black screen mode. The mode exits when the user moves the mouse or presses a key, returning safely to `0%`.
 
 ---
 
 ## 🔬 Science Fair Sections
 
 ### [1] Introduction
-The goal of this project is to see if you can use piezoelectric sensors and a running HTML program so that whenever you touch a sensor, it sends a small signal. An LED lights up, and the Arduino microcontroller receives the signal and passes it to the HTML program, which plays sounds based on how much time you press the sensor.
+
+The goal of this project is to create a custom brightness slider that feels faster and more useful than the default Windows brightness controls. Instead of opening a settings menu, the user can move the mouse to the right edge of the screen and scroll to control brightness.
 
 ### [2] Hypothesis
-If a piezoelectric sensor is tapped or pressed for different lengths of time, then the Arduino will measure the exact duration of the touch, instantly light up an LED, and signal an HTML program to alter the playback pitch and speed of a drum sound based on that duration, because the microcontroller can translate varying physical vibration times into distinct digital speed categories.
+
+If brightness control is handled with a custom AutoHotkey script that separates the visual update from the slower hardware update, then the brightness slider will feel more responsive, because the user interface can change instantly while the actual monitor command is sent only after scrolling slows down.
 
 ### [3] Analysis
-The system uses an envelope-following algorithm to track physical vibrations. When a sensor is struck, the Arduino captures the input data. Once the sensor's voltage falls back below the threshold, the total duration of the hit is calculated. The data is split into three duration tiers and transmitted over a 115,200 baud Serial connection via Web Serial API to the browser. The HTML program dynamically modifies the `playbackRate` property of the audio elements based on these tiers, shifting the pitch and speed of the drum sample to match the player's touch.
+
+The script uses AutoHotkey v2 to detect mouse position and capture scroll input only near the right edge of the screen. It stores the current brightness value, updates a custom GUI, and then uses a timer to delay the hardware brightness command. This debounce system reduces lag because the script avoids sending too many brightness commands at once. For very low brightness, the script uses a fullscreen black overlay with transparency, which creates extra dimming even when the monitor's physical brightness cannot go lower.
 
 ### [4] Results
-The project successfully achieved real-time, touch-duration audio manipulation. Testing showed that lighter, crisper taps successfully triggered fast playback speeds (pitching the sample up), while longer, heavier presses accurately triggered slower, deeper playback speeds. Simultaneously, the LEDs successfully matched the intensity of the hits using Pulse Width Modulation (`analogWrite`) mapped to the sensor's peak electrical envelope.
+
+The project successfully created a custom brightness control that works from the right edge of the screen. The final version includes smooth scrolling, a custom visual slider, automatic startup, low-brightness dimming, and a full dark mode that exits with mouse or keyboard input.
+
+---
+
+## 🎮 How To Use
+
+1. Install AutoHotkey v2.
+2. Run `brightness_edge_slider.ahk`.
+3. Move the mouse to the far-right edge of the screen.
+4. Scroll up to increase brightness.
+5. Scroll down to decrease brightness.
+6. At `0%`, scroll down one more time to enter `dark` mode.
+7. Move the mouse or press any key to exit `dark` mode.
+
+---
+
+## 📌 Notes
+
+* Some monitors support native Windows brightness control, and some do not.
+* If native control does not work, Twinkle Tray can be used as a fallback.
+* The visual slider is designed to update instantly, even if the physical brightness takes a moment to catch up.
+* Full dark mode is only a screen overlay. It does not turn off the monitor.
+* The project is not a separate `.exe` by itself. AutoHotkey is the `.exe` that runs the `.ahk` code file.
